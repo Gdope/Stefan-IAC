@@ -55,3 +55,7 @@ variable "Zone3" {
 variable "PROJECT" {
   default = "stefan-iac"
 }
+
+variable "my_ip" {
+  default = "77.243.25.205"
+}
