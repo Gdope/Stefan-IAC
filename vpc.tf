@@ -16,7 +16,7 @@ module "vpc" {
 
 
   tags = {
-    Name = var.VPC_NAME
+    Name    = var.VPC_NAME
     Project = var.PROJECT
   }
 }
