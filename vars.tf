@@ -60,7 +60,7 @@ variable "my_ip" {
   default = "77.243.25.205/32"
 }
 
-variable "count" {
+variable "instance_count" {
   default = "1"
 }
 
