@@ -37,7 +37,7 @@ variable "PrivSub3CIDR" {
 }
 
 variable "VPC_NAME" {
-  default = "vprofile-VPC"
+  default = "Stefan-VPC"
 }
 
 variable "Zone1" {
@@ -50,4 +50,12 @@ variable "Zone2" {
 
 variable "Zone3" {
   default = "us-east-1c"
+}
+
+variable "VPC_NAME" {
+  default = "stefan-vpc"
+}
+
+variable "PROJECT" {
+  default = "stefan-iac"
 }
