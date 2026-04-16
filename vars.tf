@@ -3,12 +3,6 @@ variable "aws_key_pair_name" {
   type        = string
 }
 
-variable "PUB_KEY_PATH" {
-  description = "Path to public SSH key"
-  type        = string
-}
-
-
 variable "region" {
   description = "AWS region"
   type        = string
