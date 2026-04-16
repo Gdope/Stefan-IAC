@@ -35,7 +35,7 @@ resource "aws_instance" "stefan_mc01" {
   subnet_id              = module.vpc.private_subnets[0]
   count                  = var.instance_count
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
-  user_data              = file("${path.module}/scripts/user_data/memcached.sh")
+  user_data              = file("scripts/user_data/memcached.sh")
 
   tags = {
     Name = "stefan-memcached"
@@ -50,7 +50,7 @@ resource "aws_instance" "stefan_rmq01" {
   subnet_id              = module.vpc.private_subnets[0]
   count                  = var.instance_count
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
-  user_data              = file("${path.module}/scripts/user_data/rabbitmq.sh")
+  user_data              = file("scripts/user_data/rabbitmq.sh")
 
   tags = {
     Name = "stefan-rabbitmq"

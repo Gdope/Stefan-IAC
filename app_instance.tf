@@ -5,7 +5,7 @@ resource "aws_instance" "stefan_app01" {
   subnet_id              = module.vpc.private_subnets[0]
   count                  = var.instance_count
   vpc_security_group_ids = [aws_security_group.app_sg.id]
-  user_data              = file("${path.module}/scripts/user_data/app.sh")
+  user_data              = file("scripts/user_data/app.sh")
 
   tags = {
     Name = "stefan-app"
