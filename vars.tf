@@ -1,16 +1,20 @@
 variable "aws_key_pair_name" {
-  default = "iac-key-tf"
+  description = "AWS key pair name"
+  type        = string
 }
+
 variable "PUB_KEY_PATH" {
   description = "Path to public SSH key"
-  default     = "~/.ssh/iac-key-tf.pub"
+  type        = string
 }
 
 variable "PRIV_KEY_PATH" {
   description = "Path to private SSH key"
-  default     = "~/.ssh/iac-key-tf"
+  type        = string
 }
 
 variable "region" {
-  default = "us-east-1"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
