@@ -8,10 +8,6 @@ variable "PUB_KEY_PATH" {
   type        = string
 }
 
-variable "PRIV_KEY_PATH" {
-  description = "Path to private SSH key"
-  type        = string
-}
 
 variable "region" {
   description = "AWS region"
