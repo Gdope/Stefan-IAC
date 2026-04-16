@@ -59,3 +59,9 @@ variable "PROJECT" {
 variable "my_ip" {
   default = "77.243.25.205/32"
 }
+
+variable "count" {
+  default = 1
+}
+
+

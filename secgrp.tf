@@ -1,5 +1,5 @@
 resource "aws_security_group" "stefan_elb_sg" {
-  name        = "stefan-elb-sg"
+  name        = "stefan-elb-sg-iac"
   description = "Load Balancer Security Group"
   vpc_id      = module.vpc.vpc_id
 
