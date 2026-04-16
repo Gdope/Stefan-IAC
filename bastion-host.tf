@@ -20,7 +20,7 @@ resource "aws_instance" "stefan_bastion_host" {
   key_name               = aws_key_pair.iac_key_tf.key_name
   subnet_id              = module.vpc.public_subnets[0]
   count                  = var.instance_count
-  vpc_security_group_ids = [aws_security_group.bastion_sg]
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
   tags = {
     Name = "stefan-bastion-host"
