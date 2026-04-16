@@ -1,0 +1,10 @@
+name: Terraform Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - main
+
