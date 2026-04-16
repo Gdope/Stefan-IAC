@@ -61,7 +61,7 @@ variable "my_ip" {
 }
 
 variable "count" {
-  default = 1
+  default = "1"
 }
 
 
