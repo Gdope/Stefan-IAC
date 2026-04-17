@@ -139,9 +139,9 @@ resource "aws_vpc_security_group_ingress_rule" "all_traffic_from_itself" {
 
 }
 resource "aws_vpc_security_group_ingress_rule" "all_traffic_from_app_sg" {
-  security_group_id = aws_security_group.backend_sg.id
+  security_group_id            = aws_security_group.backend_sg.id
   referenced_security_group_id = aws_security_group.app_sg.id
-  ip_protocol       = "-1"
+  ip_protocol                  = "-1"
 }
 resource "aws_vpc_security_group_egress_rule" "allow_AllOutbound_ipv4_backend" {
   security_group_id = aws_security_group.backend_sg.id
