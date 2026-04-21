@@ -1,25 +1,56 @@
 #!/bin/bash
 set -e
 
-sudo apt update -y
+exec > /var/log/user-data.log 2>&1
 
-# install rabbitmq
-sudo apt install -y rabbitmq-server
+echo "=== RABBITMQ USER DATA START ==="
 
-# enable & start
-sudo systemctl enable rabbitmq-server
-sudo systemctl start rabbitmq-server
+retry() {
+  local n=1
+  local max=5
+  local delay=10
+  while true; do
+    "$@" && break || {
+      if [[ $n -lt $max ]]; then
+        echo "Command failed. Attempt $n/$max..."
+        ((n++))
+        sleep $delay
+      else
+        echo "Command failed after $n attempts."
+        return 1
+      fi
+    }
+  done
+}
 
-# enable management UI (optional ali preporuka)
-sudo rabbitmq-plugins enable rabbitmq_management
+echo "Waiting for internet connectivity..."
+retry ping -c 3 google.com
 
-# allow remote access (disable loopback restriction)
-echo '[{rabbit, [{loopback_users, []}]}].' | sudo tee /etc/rabbitmq/rabbitmq.config
+echo "Updating packages..."
+retry apt-get update -y
 
-# create user
-sudo rabbitmqctl add_user test test
-sudo rabbitmqctl set_user_tags test administrator
-sudo rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
+echo "Installing RabbitMQ..."
+retry apt-get install -y rabbitmq-server
 
-# restart
-sudo systemctl restart rabbitmq-server
+echo "Enabling and starting RabbitMQ..."
+systemctl enable rabbitmq-server
+systemctl start rabbitmq-server
+
+echo "Enabling management plugin..."
+rabbitmq-plugins enable rabbitmq_management
+
+echo "Allowing remote access..."
+echo '[{rabbit, [{loopback_users, []}]}].' > /etc/rabbitmq/rabbitmq.config
+
+echo "Restarting RabbitMQ..."
+systemctl restart rabbitmq-server
+
+echo "Creating admin user..."
+rabbitmqctl add_user test test || true
+rabbitmqctl set_user_tags test administrator
+rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
+
+echo "Checking RabbitMQ status..."
+systemctl status rabbitmq-server --no-pager
+
+echo "=== RABBITMQ USER DATA FINISHED SUCCESSFULLY ==="

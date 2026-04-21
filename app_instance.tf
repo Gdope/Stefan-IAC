@@ -8,7 +8,8 @@ resource "aws_instance" "stefan_app01" {
   user_data              = file("scripts/user_data/app.sh")
 
   tags = {
-    Name = "stefan-app"
+    Name    = "stefan-app"
+    Project = "stefan-IAC"
 
   }
 
