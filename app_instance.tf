@@ -13,5 +13,41 @@ resource "aws_instance" "stefan_app01" {
     Project = "stefan-IAC"
 
   }
+provisioner "file" {
+  content = templatefile("templates/db-deploy.tmpl", {
+    rds_endpoint = aws_db_instance.stefan_rds.address
+    dbuser       = var.dbuser
+    dbpass       = var.dbpass
+  })
+
+  destination = "/tmp/db-deploy.sh"
+
+  connection {
+    type                = "ssh"
+    user                = var.USERNAME
+    host                = aws_instance.stefan_app01[0].private_ip
+    private_key         = file(var.PRIV_KEY_PATH)
+    bastion_host        = aws_instance.stefan_bastion_host[0].public_ip
+    bastion_user        = var.USERNAME
+    bastion_private_key = file(var.PRIV_KEY_PATH)
+  }
+}
+
+provisioner "remote-exec" {
+  inline = [
+    "chmod +x /tmp/db-deploy.sh",
+    "sudo /tmp/db-deploy.sh"
+  ]
+
+  connection {
+    type                = "ssh"
+    user                = var.USERNAME
+    host                = aws_instance.stefan_app01[0].private_ip
+    private_key         = file(var.PRIV_KEY_PATH)
+    bastion_host        = aws_instance.stefan_bastion_host[0].public_ip
+    bastion_user        = var.USERNAME
+    bastion_private_key = file(var.PRIV_KEY_PATH)
+  }
+}
 
 }

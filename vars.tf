@@ -73,3 +73,10 @@ variable "dbuser" {
 variable "dbpass" {
   default = "admin123"
 }
+variable "USERNAME" {
+  default = "ubuntu"
+}
+
+variable "PRIV_KEY_PATH" {
+  default = "iac-key-tf"
+}
