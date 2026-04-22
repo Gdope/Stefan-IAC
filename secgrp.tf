@@ -158,8 +158,8 @@ resource "aws_vpc_security_group_egress_rule" "allow_AllOutbound_ipv6_backend" {
 
 
 
-resource "aws_security_group" "rds_sg" {
-  name        = "stefan-rds-sg"
+resource "aws_security_group" "stefan_rds_sg" {
+  name        = "stefan_rds_sg"
   description = "RDS security group"
   vpc_id      = module.vpc.vpc_id
 
@@ -171,19 +171,19 @@ resource "aws_security_group" "rds_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_app_to_mysql" {
-  security_group_id            = aws_security_group.rds_sg.id
+  security_group_id            = aws_security_group.stefan_rds_sg.id
   referenced_security_group_id = aws_security_group.app_sg.id
   from_port                    = 3306
   ip_protocol                  = "tcp"
   to_port                      = 3306
 }
 resource "aws_vpc_security_group_egress_rule" "allow_AllOutbound_ipv4_rds" {
-  security_group_id = aws_security_group.rds_sg.id
+  security_group_id = aws_security_group.stefan_rds_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
 resource "aws_vpc_security_group_egress_rule" "allow_AllOutbound_ipv6_rds" {
-  security_group_id = aws_security_group.rds_sg.id
+  security_group_id = aws_security_group.stefan_rds_sg.id
   cidr_ipv6         = "::/0"
   ip_protocol       = "-1"
 }
