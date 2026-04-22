@@ -64,4 +64,12 @@ variable "instance_count" {
   default = "1"
 }
 
-
+variable "dbname" {
+  default = "accounts"
+}
+variable "dbuser" {
+  default = "admin"
+}
+variable "dbpass" {
+  default = "admin123"
+}
