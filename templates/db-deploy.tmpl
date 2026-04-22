@@ -1,4 +1,24 @@
-sudo apt update
-sudo apt install git mysql-client -y
-git clone -b local https://github.com/hkhcoder/vprofile-project.git
+#!/bin/bash
+set -e
+
+echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4 > /dev/null
+
+sudo apt-get update -y
+sudo apt-get install -y git mysql-client
+
+cd /home/ubuntu
+
+if [ ! -d "/home/ubuntu/vprofile-project" ]; then
+  git clone -b local https://github.com/hkhcoder/vprofile-project.git
+fi
+
+echo "Waiting for RDS..."
+
+until mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} -e "show databases;" > /dev/null 2>&1; do
+  echo "RDS not ready yet..."
+  sleep 10
+done
+
+echo "RDS is ready!"
+
 mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} accounts --ssl-mode=DISABLED < /home/ubuntu/vprofile-project/src/main/resources/db_backup.sql
