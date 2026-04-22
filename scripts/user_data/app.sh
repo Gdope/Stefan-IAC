@@ -31,9 +31,10 @@ retry apt-get install -y openjdk-17-jdk curl
 useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat || true
 
 cd /tmp
-curl -LO https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.39/bin/apache-tomcat-10.1.39.tar.gz
+retry curl -fL -o apache-tomcat-10.1.54.tar.gz https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.54/bin/apache-tomcat-10.1.54.tar.gz
+
 mkdir -p /opt/tomcat
-tar -xzf apache-tomcat-10.1.39.tar.gz -C /opt/tomcat --strip-components=1
+tar -xzf apache-tomcat-10.1.54.tar.gz -C /opt/tomcat --strip-components=1
 
 chown -R tomcat:tomcat /opt/tomcat
 chmod -R u+x /opt/tomcat/bin
@@ -45,21 +46,15 @@ After=network.target
 
 [Service]
 Type=forking
-
 User=tomcat
 Group=tomcat
-
 Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
 Environment=CATALINA_HOME=/opt/tomcat
 Environment=CATALINA_BASE=/opt/tomcat
-Environment='CATALINA_OPTS=-Xms256M -Xmx512M -server -XX:+UseParallelGC'
-Environment='JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom'
-
 ExecStart=/opt/tomcat/bin/startup.sh
 ExecStop=/opt/tomcat/bin/shutdown.sh
-
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
