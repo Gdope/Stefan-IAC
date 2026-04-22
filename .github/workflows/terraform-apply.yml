@@ -26,6 +26,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Create SSH private key file
+        shell: bash
+        run: |
+          cat > iac-key-tf <<'EOF'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          EOF
+          chmod 600 iac-key-tf
+
       - name: Terraform Init
         run: terraform init
 
