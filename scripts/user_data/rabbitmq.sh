@@ -5,10 +5,12 @@ exec > /var/log/user-data.log 2>&1
 
 echo "=== RABBITMQ USER DATA START ==="
 
+echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
+
 retry() {
   local n=1
-  local max=5
-  local delay=10
+  local max=10
+  local delay=15
   while true; do
     "$@" && break || {
       if [[ $n -lt $max ]]; then
@@ -22,9 +24,6 @@ retry() {
     }
   done
 }
-
-echo "Waiting for internet connectivity..."
-retry ping -c 3 google.com
 
 echo "Updating packages..."
 retry apt-get update -y
@@ -40,7 +39,9 @@ echo "Enabling management plugin..."
 rabbitmq-plugins enable rabbitmq_management
 
 echo "Allowing remote access..."
-echo '[{rabbit, [{loopback_users, []}]}].' > /etc/rabbitmq/rabbitmq.config
+cat > /etc/rabbitmq/rabbitmq.config <<'EOF'
+[{rabbit, [{loopback_users, []}]}].
+EOF
 
 echo "Restarting RabbitMQ..."
 systemctl restart rabbitmq-server

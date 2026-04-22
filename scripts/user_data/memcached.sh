@@ -5,10 +5,12 @@ exec > /var/log/user-data.log 2>&1
 
 echo "=== MEMCACHED USER DATA START ==="
 
+echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
+
 retry() {
   local n=1
-  local max=5
-  local delay=10
+  local max=10
+  local delay=15
   while true; do
     "$@" && break || {
       if [[ $n -lt $max ]]; then
@@ -23,9 +25,6 @@ retry() {
   done
 }
 
-echo "Waiting for internet connectivity..."
-retry ping -c 3 google.com
-
 echo "Updating packages..."
 retry apt-get update -y
 
@@ -37,7 +36,6 @@ sed -i 's/^-l 127.0.0.1/-l 0.0.0.0/' /etc/memcached.conf
 
 echo "Enabling and starting memcached..."
 systemctl enable memcached
-systemctl start memcached
 systemctl restart memcached
 
 echo "Checking memcached status..."
