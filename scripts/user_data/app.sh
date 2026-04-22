@@ -5,6 +5,8 @@ exec > /var/log/user-data.log 2>&1
 
 echo "=== USER DATA START ==="
 
+echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
+
 retry() {
   local n=1
   local max=10
@@ -23,20 +25,49 @@ retry() {
   done
 }
 
-echo "Running apt update..."
 retry apt-get update -y
+retry apt-get install -y openjdk-17-jdk curl
 
-echo "Upgrading packages..."
-retry apt-get upgrade -y
+useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat || true
 
-echo "Installing Java and Tomcat..."
-retry apt-get install -y openjdk-17-jdk tomcat10 tomcat10-admin tomcat10-docs tomcat10-common git
+cd /tmp
+curl -LO https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.39/bin/apache-tomcat-10.1.39.tar.gz
+mkdir -p /opt/tomcat
+tar -xzf apache-tomcat-10.1.39.tar.gz -C /opt/tomcat --strip-components=1
 
-echo "Starting Tomcat..."
-systemctl enable tomcat10
-systemctl start tomcat10
+chown -R tomcat:tomcat /opt/tomcat
+chmod -R u+x /opt/tomcat/bin
 
-echo "Checking Tomcat status..."
-systemctl status tomcat10 --no-pager
+cat > /etc/systemd/system/tomcat.service <<'EOF'
+[Unit]
+Description=Apache Tomcat 10
+After=network.target
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms256M -Xmx512M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable tomcat
+systemctl start tomcat
+systemctl status tomcat --no-pager
 
 echo "=== USER DATA FINISHED SUCCESSFULLY ==="
