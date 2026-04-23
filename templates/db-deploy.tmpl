@@ -1,19 +1,52 @@
 #!/bin/bash
 set -e
 
+exec > /var/log/db-deploy.log 2>&1
+
+echo "=== DB DEPLOY START ==="
+
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4 > /dev/null
 
-sudo apt-get update -y
-sudo apt-get install -y git mysql-client
+retry() {
+  local n=1
+  local max=10
+  local delay=15
+  while true; do
+    "$@" && break || {
+      if [[ $n -lt $max ]]; then
+        echo "Command failed. Attempt $n/$max..."
+        ((n++))
+        sleep $delay
+      else
+        echo "The command has failed after $n attempts."
+        return 1
+      fi
+    }
+  done
+}
+
+echo "Updating packages..."
+retry sudo apt-get update -y
+
+echo "Installing git..."
+retry sudo apt-get install -y git
+
+echo "Fixing broken packages if needed..."
+retry sudo apt-get install -f -y
+
+echo "Installing MySQL client..."
+retry sudo apt-get install -y default-mysql-client
 
 cd /home/ubuntu
 
 if [ ! -d "/home/ubuntu/vprofile-project" ]; then
-  git clone -b local https://github.com/hkhcoder/vprofile-project.git
+  echo "Cloning vprofile repository..."
+  retry git clone -b local https://github.com/hkhcoder/vprofile-project.git
+else
+  echo "vprofile-project already exists, skipping clone."
 fi
 
 echo "Waiting for RDS..."
-
 until mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} -e "show databases;" > /dev/null 2>&1; do
   echo "RDS not ready yet..."
   sleep 10
@@ -21,8 +54,11 @@ done
 
 echo "RDS is ready!"
 
+echo "Creating accounts database if it does not exist..."
 mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} -e "CREATE DATABASE IF NOT EXISTS accounts;"
 
+echo "Importing database backup..."
 mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} accounts --ssl-mode=DISABLED < /home/ubuntu/vprofile-project/src/main/resources/db_backup.sql
 
 echo "Database initialization completed successfully!"
+echo "=== DB DEPLOY END ==="
