@@ -1,9 +1,10 @@
 module "alb" {
   source = "terraform-aws-modules/alb/aws"
 
-  name               = "stefan-alb"
-  load_balancer_type = "application"
-  internal           = false
+  name                       = "stefan-alb"
+  load_balancer_type         = "application"
+  internal                   = false
+  enable_deletion_protection = false
 
   vpc_id          = module.vpc.vpc_id
   subnets         = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2]]
