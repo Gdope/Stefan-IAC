@@ -25,7 +25,7 @@ resource "aws_instance" "stefan_app01" {
     connection {
       type                = "ssh"
       user                = var.USERNAME
-      host                = aws_instance.stefan_app01[0].private_ip
+      host                = self.private_ip
       private_key         = file(var.PRIV_KEY_PATH)
       bastion_host        = aws_instance.stefan_bastion_host[0].public_ip
       bastion_user        = var.USERNAME
@@ -42,7 +42,7 @@ resource "aws_instance" "stefan_app01" {
     connection {
       type                = "ssh"
       user                = var.USERNAME
-      host                = aws_instance.stefan_app01[0].private_ip
+      host                = self.private_ip
       private_key         = file(var.PRIV_KEY_PATH)
       bastion_host        = aws_instance.stefan_bastion_host[0].public_ip
       bastion_user        = var.USERNAME
