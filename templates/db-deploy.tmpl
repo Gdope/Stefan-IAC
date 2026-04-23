@@ -21,4 +21,8 @@ done
 
 echo "RDS is ready!"
 
+mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} -e "CREATE DATABASE IF NOT EXISTS accounts;"
+
 mysql -h ${rds_endpoint} -u ${dbuser} --password=${dbpass} accounts --ssl-mode=DISABLED < /home/ubuntu/vprofile-project/src/main/resources/db_backup.sql
+
+echo "Database initialization completed successfully!"
