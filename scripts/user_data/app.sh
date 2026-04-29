@@ -65,4 +65,12 @@ systemctl enable tomcat
 systemctl start tomcat
 systemctl status tomcat --no-pager
 
+echo "Installing AWS CLI..."
+
+retry apt-get install -y awscli
+
+aws --version
+
+echo "AWS CLI installed successfully"
+
 echo "=== USER DATA FINISHED SUCCESSFULLY ==="
