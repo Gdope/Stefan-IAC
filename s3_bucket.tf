@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "iac_bucket" {
-  bucket = "stefan_iac_cicd_bucket420"
+  bucket = "stefan-iac-cicd-bucket"
   region = var.region
 
   tags = {
