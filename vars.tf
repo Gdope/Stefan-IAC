@@ -80,3 +80,7 @@ variable "USERNAME" {
 variable "PRIV_KEY_PATH" {
   default = "iac-key-tf"
 }
+
+variable "artifact_bucket_name" {
+  default = "stefan-iac-cicd-bucket"
+}
