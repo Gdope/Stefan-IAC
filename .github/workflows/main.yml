@@ -1,10 +1,52 @@
-name: Placeholder
+name: Terraform Pipeline
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  dummy:
+  terraform:
+    name: Terraform Checks
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: .
+
     steps:
-      - run: echo "This is a placeholder workflow"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Create SSH private key file
+        shell: bash
+        run: |
+          cat > iac-key-tf <<'EOF'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          EOF
+          chmod 600 iac-key-tf
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
