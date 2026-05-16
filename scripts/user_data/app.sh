@@ -11,6 +11,7 @@ retry() {
   local n=1
   local max=10
   local delay=15
+
   while true; do
     "$@" && break || {
       if [[ $n -lt $max ]]; then
@@ -25,20 +26,28 @@ retry() {
   done
 }
 
+echo "Updating packages..."
 retry apt-get update -y
-retry apt-get install -y openjdk-17-jdk curl
 
+echo "Installing Java, curl and unzip..."
+retry apt-get install -y openjdk-17-jdk curl unzip
+
+echo "Creating tomcat user..."
 useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat || true
 
 cd /tmp
-retry curl -fL -o apache-tomcat-10.1.54.tar.gz https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.54/bin/apache-tomcat-10.1.54.tar.gz
 
+echo "Downloading Tomcat..."
+retry curl -fL -o apache-tomcat-10.1.54.tar.gz https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.54/bin/apache-tomcat-10.1.54.tar.gz
+
+echo "Installing Tomcat..."
 mkdir -p /opt/tomcat
 tar -xzf apache-tomcat-10.1.54.tar.gz -C /opt/tomcat --strip-components=1
 
 chown -R tomcat:tomcat /opt/tomcat
 chmod -R u+x /opt/tomcat/bin
 
+echo "Creating Tomcat systemd service..."
 cat > /etc/systemd/system/tomcat.service <<'EOF'
 [Unit]
 Description=Apache Tomcat 10
@@ -60,14 +69,18 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
+echo "Starting Tomcat..."
 systemctl daemon-reload
 systemctl enable tomcat
 systemctl start tomcat
 systemctl status tomcat --no-pager
 
-echo "Installing AWS CLI..."
+echo "Installing AWS CLI v2..."
 
-retry apt-get install -y awscli
+cd /tmp
+retry curl -fL -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+unzip -o awscliv2.zip
+./aws/install
 
 aws --version
 
